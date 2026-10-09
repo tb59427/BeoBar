@@ -1,5 +1,5 @@
 #!/bin/bash
-# Baut BeoBar.app aus BeoBar.swift
+# Baut BeoBar.app aus den *.swift-Dateien
 set -e
 cd "$(dirname "$0")"
 
@@ -7,8 +7,8 @@ APP=BeoBar.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
 
-swiftc -O -o "$APP/Contents/MacOS/BeoBar" BeoBar.swift \
-    -framework Cocoa -framework WebKit
+swiftc -O -o "$APP/Contents/MacOS/BeoBar" *.swift \
+    -framework Cocoa -framework SwiftUI -framework ServiceManagement
 
 cat > "$APP/Contents/Info.plist" <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -20,7 +20,7 @@ cat > "$APP/Contents/Info.plist" <<'EOF'
     <key>CFBundleName</key>            <string>BeoBar</string>
     <key>CFBundlePackageType</key>     <string>APPL</string>
     <key>CFBundleShortVersionString</key> <string>1.0</string>
-    <key>LSMinimumSystemVersion</key>  <string>12.0</string>
+    <key>LSMinimumSystemVersion</key>  <string>14.0</string>
     <key>LSUIElement</key>             <true/>
     <key>NSHighResolutionCapable</key> <true/>
 </dict>
