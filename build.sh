@@ -3,7 +3,10 @@
 set -e
 cd "$(dirname "$0")"
 
-APP=BeoBar.app
+# Gebaut wird auf der internen Platte: auf exFAT (z. B. externes Repo-Laufwerk) legt macOS
+# für Dateiattribute "._"-Dateien an, und codesign lehnt das Bundle dann ab.
+OUT="${BEOBAR_BUILD_DIR:-$HOME/Library/Caches/BeoBar-build}"
+APP="$OUT/BeoBar.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS"
 
@@ -36,4 +39,4 @@ else
     echo "Hinweis: Zertifikat '$SIGN_ID' fehlt – signiere ad hoc"
     codesign --force --sign - "$APP"
 fi
-echo "Fertig: $(pwd)/$APP"
+echo "Fertig: $APP"
