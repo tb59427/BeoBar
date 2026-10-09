@@ -27,5 +27,13 @@ cat > "$APP/Contents/Info.plist" <<'EOF'
 </plist>
 EOF
 
-codesign --force --sign - "$APP"
+# Mit festem Zertifikat signieren, damit macOS-Freigaben (Bedienungshilfen) einen
+# Neubau überstehen; ohne Zertifikat ad hoc (Freigabe muss dann neu erteilt werden).
+SIGN_ID="BeoBar Local Signing"
+if security find-identity -p codesigning | grep -q "\"$SIGN_ID\""; then
+    codesign --force --sign "$SIGN_ID" "$APP"
+else
+    echo "Hinweis: Zertifikat '$SIGN_ID' fehlt – signiere ad hoc"
+    codesign --force --sign - "$APP"
+fi
 echo "Fertig: $(pwd)/$APP"
