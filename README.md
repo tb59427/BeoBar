@@ -68,6 +68,13 @@ Browser* → set up the PC2 connection in BeoControl once.
 **4. Media keys:** allow BeoBar under *System Settings → Privacy & Security
 → Accessibility*. macOS asks on first start.
 
+### Optional: your own menu bar icon
+
+BeoBar shows a speaker symbol. To use your own, put a single-colour image at
+`~/Library/Application Support/BeoBar/menubar-icon.svg` (or `.pdf` / `.png`),
+drawn in black on transparent; macOS tints it for light and dark menu bars.
+It's read at start.
+
 ### Optional: keep the Accessibility permission across rebuilds
 
 macOS ties the permission to the app's signature. `build.sh` signs ad hoc
@@ -104,7 +111,9 @@ The UI is in German for now.
 
 - [BeoControl](https://github.com/wolfgangschneider/BeoControl) by Wolfgang
   Schneider does the actual work with the PC2.
-- Menu bar icon after "bang-and-olufsen" from
-  [Arcticons](https://github.com/Arcticons-Team/Arcticons) (CC BY-SA 4.0).
 - Bang & Olufsen, BeoLink, Beo4 and MasterLink are trademarks of Bang &
   Olufsen. This project is not affiliated with Bang & Olufsen.
+
+## License
+
+[MIT](LICENSE)

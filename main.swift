@@ -16,25 +16,21 @@ let setupURL     = URL(string: "http://127.0.0.1:\(port)/setup")!
 let apiURL       = "http://127.0.0.1:\(port)/api"
 // ─────────────────────────────────────────────────────────────────
 
-// ── Menüleisten-Symbol: B&O-Logo ─────────────────────────────────
-// Nach "bang-and-olufsen" aus Arcticons (CC BY-SA 4.0, https://github.com/Arcticons-Team/Arcticons),
-// Strich für die Menüleiste verstärkt (1 → 2.6). Als Vorlage: macOS färbt es hell/dunkel passend.
-let boLogoSVG = """
-<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
-<g fill="none" stroke="black" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-<circle cx="28.884" cy="29.69" r="6.262"/>
-<path d="M12.854 26.813c4.904 0 7.93-3.316 7.93-7.407S17.758 12 12.854 12v23.95c4.127.379 6.075-1.486 6.075-4.569s-1.948-4.948-6.075-4.57m17.313-14.233a1.743 1.743 0 1 0-2.465 2.465l5.34 5.34"/>
-<path d="m33.041 16.673l-3.198 3.199a1.743 1.743 0 1 1-2.465-2.465l1.344-1.344"/>
-<circle cx="24" cy="24" r="20.7"/>
-</g></svg>
-"""
+// ── Menüleisten-Symbol ───────────────────────────────────────────
+// Eigenes Symbol, falls vorhanden (SVG, PDF oder PNG, einfarbig -- macOS färbt
+// es hell/dunkel passend), sonst ein Lautsprecher aus den Systemsymbolen.
+let customIconDir = NSString(string: "~/Library/Application Support/BeoBar").expandingTildeInPath
 
-func boLogo() -> NSImage? {
-    guard let img = NSImage(data: Data(boLogoSVG.utf8)) else { return nil }
-    img.size = NSSize(width: 18, height: 18)
-    img.isTemplate = true
-    img.accessibilityDescription = "BeoControl"
-    return img
+func menuBarIcon() -> NSImage? {
+    for ext in ["svg", "pdf", "png"] {
+        if let img = NSImage(contentsOfFile: "\(customIconDir)/menubar-icon.\(ext)") {
+            img.size = NSSize(width: 18, height: 18)
+            img.isTemplate = true
+            img.accessibilityDescription = "BeoControl"
+            return img
+        }
+    }
+    return NSImage(systemSymbolName: "hifispeaker.2", accessibilityDescription: "BeoControl")
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -67,11 +63,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         mediaKeys.start()
     }
 
-    // B&O-Logo; während eines Anrufs (PC2 auf Mac umgeschaltet) Telefon-Symbol
+    // Menüleisten-Symbol; während eines Anrufs (PC2 auf Mac umgeschaltet) Telefon-Symbol
     func setIcon(call: Bool) {
         statusItem.button?.image = call
             ? NSImage(systemSymbolName: "phone.fill", accessibilityDescription: "BeoControl")
-            : boLogo() ?? NSImage(systemSymbolName: "hifispeaker.2", accessibilityDescription: "BeoControl")
+            : menuBarIcon()
     }
 
     // Server als Kindprozess starten (Ausgabe nach server.log)
