@@ -82,6 +82,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         var env = ProcessInfo.processInfo.environment
         env["ASPNETCORE_URLS"] = listenURL
         env["DYLD_LIBRARY_PATH"] = "/opt/homebrew/lib:/usr/local/lib"
+        // PC2-Debug-Log (BeoControl schreibt es, wenn die Variable gesetzt ist; max. ~2×5 MB)
+        env["BEOCONTROL_PC2_LOG"] = NSString(string: "~/Library/Logs/BeoBar/pc2-debug.log").expandingTildeInPath
         p.environment = env
 
         let logPath = serverDir + "/server.log"

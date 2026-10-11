@@ -97,6 +97,14 @@ display:
 
 The UI is in German for now.
 
+## Troubleshooting
+
+BeoBar starts the BeoControl server with a PC2 debug log at
+`~/Library/Logs/BeoBar/pc2-debug.log` (USB traffic, mixer state, Masterlink
+telegrams; rotates at ~5 MB to `pc2-debug.log.1`). Needs a BeoControl build
+with that option (`BEOCONTROL_PC2_LOG`; on the `beobar` branch). The server's
+own output goes to `~/BeoControlServer/server.log`.
+
 ## How it works
 
 | File | Purpose |
