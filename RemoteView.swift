@@ -37,10 +37,8 @@ struct RemoteView: View {
             display
             sources
             digits
-            colours
             navigation
             volume
-            standby
         }
         .padding(12)
         .frame(width: 210)
@@ -100,52 +98,73 @@ struct RemoteView: View {
         }
     }
 
-    // ── Ziffern ──
+    // ── Ziffern, Anordnung wie auf der Beo4 ──
     private var digits: some View {
         LazyVGrid(columns: grid, spacing: 6) {
-            ForEach(1...9, id: \.self) { n in key("\(n)", "\(n)") }
-            key("STOP", "stop")
+            ForEach([9, 8, 7, 6, 5, 4, 1, 2, 3], id: \.self) { n in key("\(n)", "\(n)") }
+            key("TEXT", "text")
             key("0", "0")
-            key("PLAY", "play")
+            key("MENU", "menu")
         }
     }
 
-    // ── Farbtasten ──
-    private var colours: some View {
-        HStack(spacing: 6) {
-            colourKey(.red, "red")
-            colourKey(.green, "green")
-            colourKey(.yellow, "yellow")
-            colourKey(.blue, "blue")
-        }
-    }
+    // ── Navigation wie auf der Beo4: auf der Spitze stehendes Quadrat, die
+    //    Ecken zeigen in die Richtungen, GO in der Mitte; die Farbtasten
+    //    liegen diagonal außen an den Kanten ──
+    private let navCell: CGFloat = 44
+    private let navGap: CGFloat = 4
 
-    // ── Steuerkreuz mit GO ──
     private var navigation: some View {
-        VStack(spacing: 6) {
-            key("▲", "up").frame(width: 56)
-            HStack(spacing: 6) {
-                key("◀", "left")
-                Button("GO") { client.send("go") }.buttonStyle(BeoKey(fill: Color(white: 0.45), height: 32))
-                key("▶", "right")
+        ZStack {
+            // 2×2-Raster, um 45° gedreht: oben links → oben, oben rechts → rechts, …
+            VStack(spacing: navGap) {
+                HStack(spacing: navGap) { navKey("▲", "up", corner: .topLeading); navKey("▶", "right", corner: .topTrailing) }
+                HStack(spacing: navGap) { navKey("◀", "left", corner: .bottomLeading); navKey("▼", "down", corner: .bottomTrailing) }
             }
-            key("▼", "down").frame(width: 56)
+            .rotationEffect(.degrees(45))
+
+            Button("GO") { client.send("go") }
+                .buttonStyle(RoundKey(fill: Color(white: 0.45), size: 40))
+
+            colourKey(.green, "green").rotationEffect(.degrees(-45)).offset(x: -48, y: -48)
+            colourKey(.yellow, "yellow").rotationEffect(.degrees(45)).offset(x: 48, y: -48)
+            colourKey(.red, "red").rotationEffect(.degrees(45)).offset(x: -48, y: 48)
+            colourKey(.blue, "blue").rotationEffect(.degrees(-45)).offset(x: 48, y: 48)
         }
+        .frame(maxWidth: .infinity)
+        .frame(height: 150)
     }
 
-    // ── Lautstärke ──
+    // Richtungstaste: Pfeil zur äußeren Ecke versetzt und zurückgedreht
+    private func navKey(_ arrow: String, _ cmd: String, corner: UnitPoint) -> some View {
+        let shift = navCell * 0.14
+        let dx: CGFloat = corner == .topLeading || corner == .bottomLeading ? -shift : shift
+        let dy: CGFloat = corner == .topLeading || corner == .topTrailing ? -shift : shift
+        return Button { client.send(cmd) } label: {
+            Text(arrow).rotationEffect(.degrees(-45)).offset(x: dx, y: dy)
+        }
+        .buttonStyle(BeoKey(height: navCell))
+        .frame(width: navCell)
+    }
+
+    // ── Lautstärke-Block wie auf der Beo4 ──
+    //    (LIST)  +   (EXIT)     LIST/EXIT braucht's am Mac nicht
+    //           MUTE
+    //    STOP    −   Standby
     private var volume: some View {
-        HStack(spacing: 6) {
-            key("−", "vol-")
-            key("MUTE", "mute")
+        LazyVGrid(columns: grid, spacing: 6) {
+            Color.clear.frame(height: 26)
             key("+", "vol+")
+            Color.clear.frame(height: 26)
+            Color.clear.frame(height: 26)
+            key("MUTE", "mute")
+            Color.clear.frame(height: 26)
+            key("STOP", "stop")
+            key("−", "vol-")
+            Button { client.send("standby") } label: { Image(systemName: "power") }
+                .buttonStyle(BeoKey(fill: Color(red: 0.62, green: 0.1, blue: 0.1)))
+                .help("Standby")
         }
-    }
-
-    private var standby: some View {
-        Button { client.send("standby") } label: { Image(systemName: "power") }
-            .buttonStyle(BeoKey(fill: Color(red: 0.62, green: 0.1, blue: 0.1), height: 28))
-            .help("Standby")
     }
 
     private func key(_ title: String, _ cmd: String) -> some View {
@@ -153,6 +172,24 @@ struct RemoteView: View {
     }
 
     private func colourKey(_ c: Color, _ cmd: String) -> some View {
-        Button("") { client.send(cmd) }.buttonStyle(BeoKey(fill: c.opacity(0.85), height: 14))
+        Button("") { client.send(cmd) }
+            .buttonStyle(BeoKey(fill: c.opacity(0.85), height: 14))
+            .frame(width: 50)
+    }
+}
+
+// Runde Taste (GO)
+struct RoundKey: ButtonStyle {
+    var fill: Color
+    var size: CGFloat
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .foregroundStyle(keyText)
+            .frame(width: size, height: size)
+            .background(Circle().fill(fill.opacity(configuration.isPressed ? 0.6 : 1)))
+            .overlay(Circle().stroke(bodyColor, lineWidth: 3))
+            .contentShape(Circle())
     }
 }

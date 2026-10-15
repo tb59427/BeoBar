@@ -4,8 +4,10 @@ A macOS menu bar app for [BeoControl](https://github.com/wolfgangschneider/BeoCo
 and a **BeoLink PC2**: it puts a Beo4-style remote for your MasterLink system
 into the menu bar.
 
-- **Native remote:** source keys, digits, colour keys, arrows/GO, volume and
-  standby, with a display showing source, state and volume live.
+- **Native remote:** laid out like a Beo4 -- source keys, digits (9 8 7 /
+  6 5 4 / 1 2 3, TEXT 0 MENU), the diamond of arrows around GO with the
+  colour keys on its edges, volume / mute / STOP / standby -- with a display
+  showing source, state and volume live.
 - **Configurable source keys:** nine keys you can label and assign as you
   like (N.MUSIC, CD, the Mac's own input, …), e.g. "RADIO 3".
 - **Calls:** when a call starts on the Mac (a microphone records and the
